@@ -1,0 +1,15 @@
+{
+  "name": "ovh-free-vps-monitor",
+  "version": "1.0.0",
+  "description": "Monitor dostępności VPS OVHcloud w UE (najlepiej Warszawa) — przy dostępności tworzy issue na GitHubie.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dry-run": "node src/index.mjs --dry-run",
+    "test": "node --test \"test/**/*.test.mjs\""
+  }
+}

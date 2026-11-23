@@ -1,0 +1,3 @@
+# Skrypty uruchamiane w kontenerze Linux muszą mieć końcówki LF, także po checkoucie na Windowsie.
+*.sh text eol=lf
+Dockerfile text eol=lf

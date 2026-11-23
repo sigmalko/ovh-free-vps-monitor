@@ -1,0 +1,29 @@
+name: ovh-free-vps-monitor
+
+services:
+  monitor:
+    build: .
+    image: ovh-free-vps-monitor:latest
+    container_name: ovh-free-vps-monitor
+    restart: unless-stopped
+    init: true
+    environment:
+      # Harmonogram crona (5 pól). Zmieniasz go tutaj albo w pliku .env obok tego pliku.
+      CRON_SCHEDULE: "${CRON_SCHEDULE:-*/10 * * * *}"
+      TZ: "${TZ:-Europe/Warsaw}"
+      # Pierwsze sprawdzenie od razu po starcie kontenera (true/false).
+      RUN_ON_START: "${RUN_ON_START:-true}"
+      # Repozytorium, w którym powstają issue (owner/repo).
+      GITHUB_REPOSITORY: "${GITHUB_REPOSITORY:-sigmalko/ovh-free-vps-monitor}"
+      # Kraje, o których powiadamiamy (kody ISO). Domyślnie cała UE; "PL" = tylko Polska.
+      COUNTRIES: "${COUNTRIES:-}"
+      OVH_SUBSIDIARY: "${OVH_SUBSIDIARY:-PL}"
+      # Aplikacja czyta token z pliku zamontowanego przez Docker secrets.
+      GITHUB_TOKEN_FILE: /run/secrets/github_token
+    secrets:
+      - github_token
+
+secrets:
+  # Sekret to plik na hoście (poza repozytorium). Ścieżkę zmienisz zmienną GITHUB_TOKEN_FILE_HOST.
+  github_token:
+    file: "${GITHUB_TOKEN_FILE_HOST:-./secrets/github_token}"
