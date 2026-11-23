@@ -18,6 +18,8 @@ services:
       # Kraje, o których powiadamiamy (kody ISO). Domyślnie cała UE; "PL" = tylko Polska.
       COUNTRIES: "${COUNTRIES:-}"
       OVH_SUBSIDIARY: "${OVH_SUBSIDIARY:-PL}"
+      # Regex na kodzie planu. Puste = domyślnie tylko oferta publiczna (vps-2025/2027-modelN).
+      PLAN_PATTERN: "${PLAN_PATTERN:-}"
       # Aplikacja czyta token z pliku zamontowanego przez Docker secrets.
       GITHUB_TOKEN_FILE: /run/secrets/github_token
     secrets:

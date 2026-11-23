@@ -44,6 +44,7 @@ Ustawiasz je w pliku `.env` obok `docker-compose.yml` (wzór: `.env.example`) al
 | `RUN_ON_START` | `true` | Wykonaj sprawdzenie od razu po starcie kontenera |
 | `GITHUB_REPOSITORY` | `sigmalko/ovh-free-vps-monitor` | Repozytorium (`owner/repo`), w którym powstają issue |
 | `COUNTRIES` | *(puste = cała UE)* | Kody krajów (ISO) do powiadomień, np. `PL` albo `PL,DE,CZ` |
+| `PLAN_PATTERN` | *(puste = `^vps-\d{4}-model\d+(\.LZ)?$`)* | Regex na kodzie planu. Domyślnie tylko oferta publiczna (VPS-1…6 w liniach 2025/2027, także Local Zone). `.*` = wszystkie plany z katalogu |
 | `OVH_SUBSIDIARY` | `PL` | Subsydiariusz OVH (wpływa na katalog planów i ceny) |
 | `GITHUB_TOKEN_FILE_HOST` | `./secrets/github_token` | Ścieżka do pliku z tokenem **na hoście** |
 
@@ -131,5 +132,8 @@ npm test                                   # testy jednostkowe
 
 - Lokalizacje spoza UE (np. Wielka Brytania, Kanada, Singapur) są ignorowane. Nieznany datacenter z API jest
   pomijany z ostrzeżeniem w logu — dopisz go w `src/datacenters.mjs`.
+- Domyślnie sprawdzane są tylko plany z publicznej oferty OVH. Starsze plany (Value, Essential, Comfort, Elite, Level)
+  bywają w API oznaczone jako `available`, ale nie ma ich na stronie zamówień, więc są pomijane (włączysz je przez `PLAN_PATTERN=.*`).
+- Koszyk API OVH nie weryfikuje stanu magazynowego — jedynym źródłem jest `/vps/order/rule/datacenter`.
 - Dostępność w API to stan chwilowy; „dostępny” oznacza, że konfigurator OVH pozwala w tej chwili zamówić dany plan.
 - Kontener działa jako root, żeby `crond` mógł bez problemów odczytać sekret niezależnie od uprawnień pliku na hoście.

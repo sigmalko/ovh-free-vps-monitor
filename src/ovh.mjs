@@ -33,10 +33,16 @@ async function getJson(path, { retries = 3 } = {}) {
 // Plany z sufiksami degressivity/percent to warianty cenowe tego samego planu — pomijamy.
 const VARIANT_RE = /degressivity|percent/;
 
-export async function fetchPlans(subsidiary) {
+// Domyślnie tylko plany z publicznej oferty OVH ("VPS-1…6" w liniach 2025/2027, także Local Zone),
+// bo starsze/ukryte plany (Value, Essential, Comfort, Elite, Level…) są w API "available",
+// ale nie ma ich na stronie zamówień.
+export const DEFAULT_PLAN_PATTERN = '^vps-\\d{4}-model\\d+(\\.LZ)?$';
+
+export async function fetchPlans(subsidiary, planPattern = DEFAULT_PLAN_PATTERN) {
+  const wanted = new RegExp(planPattern);
   const catalog = await getJson(`/order/catalog/public/vps?ovhSubsidiary=${encodeURIComponent(subsidiary)}`);
   return catalog.plans
-    .filter((p) => !VARIANT_RE.test(p.planCode))
+    .filter((p) => !VARIANT_RE.test(p.planCode) && wanted.test(p.planCode))
     .map((p) => ({
       planCode: p.planCode,
       name: p.invoiceName,

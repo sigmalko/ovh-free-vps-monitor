@@ -45,9 +45,12 @@ export function extractAvailable(plan, datacenters, warn = () => {}) {
 }
 
 /** Sprawdza wszystkie plany VPS i zwraca dostępne oferty (bez filtrowania po kraju). */
-export async function checkAvailability({ subsidiary, concurrency = 6, log = () => {}, warn = () => {} }) {
-  const plans = await fetchPlans(subsidiary);
-  log(`Sprawdzam ${plans.length} planów VPS (subsydiariusz ${subsidiary})…`);
+export async function checkAvailability({ subsidiary, planPattern, concurrency = 6, log = () => {}, warn = () => {} }) {
+  const plans = await fetchPlans(subsidiary, planPattern);
+  if (plans.length === 0) {
+    throw new Error(`Żaden plan z katalogu nie pasuje do wzorca "${planPattern}".`);
+  }
+  log(`Sprawdzam ${plans.length} planów VPS (subsydiariusz ${subsidiary}, wzorzec ${planPattern})…`);
   const failures = [];
   const perPlan = await mapLimit(plans, concurrency, async (plan) => {
     try {

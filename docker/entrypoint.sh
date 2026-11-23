@@ -22,7 +22,7 @@ fi
 # crond nie dziedziczy środowiska, więc zapisujemy je do pliku, który source'uje run-monitor.sh.
 q() { printf "'%s'" "$(printf %s "$1" | sed "s/'/'\\\\''/g")"; }
 {
-  for v in TZ GITHUB_TOKEN_FILE GITHUB_REPOSITORY COUNTRIES OVH_SUBSIDIARY; do
+  for v in TZ GITHUB_TOKEN_FILE GITHUB_REPOSITORY COUNTRIES OVH_SUBSIDIARY PLAN_PATTERN; do
     eval "val=\${$v:-}"
     [ -n "$val" ] && printf 'export %s=%s\n' "$v" "$(q "$val")"
   done

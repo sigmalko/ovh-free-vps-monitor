@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util';
 import { checkAvailability, groupByDatacenter } from './availability.mjs';
 import { EU_COUNTRIES } from './datacenters.mjs';
 import { buildIssue, GitHub } from './github.mjs';
+import { DEFAULT_PLAN_PATTERN } from './ovh.mjs';
 
 const HELP = `Użycie: node src/index.mjs [opcje]
 
@@ -15,7 +16,10 @@ Opcje:
   --countries <PL,DE,..>  kody krajów do powiadomień (domyślnie: wszystkie kraje UE; env COUNTRIES)
   --poland-only           skrót na --countries PL
   --subsidiary <XX>       subsydiariusz OVH, wpływa na katalog planów (domyślnie PL; env OVH_SUBSIDIARY)
-  --repo <owner/repo>     repozytorium na issue (domyślnie env GITHUB_REPOSITORY albo remote origin)
+  --plans <regex>         które plany sprawdzać (wyrażenie regularne na kodzie planu; env PLAN_PATTERN).
+                          Domyślnie tylko oferta publiczna: ${DEFAULT_PLAN_PATTERN}
+                          Wszystkie plany z katalogu: --plans '.*'
+  --repo <owner/repo>    repozytorium na issue (domyślnie env GITHUB_REPOSITORY albo remote origin)
   --dry-run               nic nie tworzy, tylko wypisuje, co by zgłosiło
   --json                  wynik na stdout w JSON
   -h, --help              ta pomoc
@@ -29,6 +33,7 @@ const { values: opt } = parseArgs({
     countries: { type: 'string' },
     'poland-only': { type: 'boolean' },
     subsidiary: { type: 'string' },
+    plans: { type: 'string' },
     repo: { type: 'string' },
     'dry-run': { type: 'boolean' },
     json: { type: 'boolean' },
@@ -82,7 +87,8 @@ async function main() {
         .map((c) => c.trim().toUpperCase())
         .filter(Boolean);
 
-  const offers = await checkAvailability({ subsidiary, log, warn });
+  const planPattern = opt.plans ?? (process.env.PLAN_PATTERN || DEFAULT_PLAN_PATTERN);
+  const offers = await checkAvailability({ subsidiary, planPattern, log, warn });
   const groups = groupByDatacenter(offers, countries);
 
   if (groups.length === 0) {
